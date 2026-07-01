@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم لإدارة التطبيقات</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent-color: #ffd700;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+            --danger-color: #cf6679;
+            --success-color: #4caf50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h2, h3 {
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .section {
+            background-color: var(--card-bg);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: #2a2a2a;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+            font-size: 0.95rem;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #121212;
+        }
+
+        .btn-primary:hover {
+            background-color: #cca300;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background-color: #b35061;
+        }
+
+        .btn-secondary {
+            background-color: #444;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background-color: #555;
+        }
+
+        .app-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #252525;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border-right: 4px solid var(--accent-color);
+            border-left: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .app-card.hidden-app {
+            opacity: 0.4;
+            border-right-color: #666;
+        }
+
+        .app-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .app-info img {
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-left: 15px;
+            background-color: #333;
+        }
+
+        .app-details .app-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .app-details .app-bundle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .status-success { background-color: rgba(76, 175, 80, 0.2); color: #81c784; border: 1px solid var(--success-color); }
+        .status-error { background-color: rgba(207, 102, 121, 0.2); color: #e57373; border: 1px solid var(--danger-color); }
+        .status-info { background-color: rgba(255, 215, 0, 0.1); color: var(--accent-color); border: 1px solid var(--accent-color); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>لوحة تحكم إدارة التطبيقات (تخزين محلي آمن)</h2>
+
+    <div class="section">
+        <h3>بيانات الربط بمستودع GitHub</h3>
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label for="gh-user">اسم المستخدم (GitHub Username)</label>
+                <input type="text" id="gh-user" placeholder="مثال: husszzzz">
+            </div>
+            <div class="input-group">
+                <label for="gh-repo">اسم المستودع (Repository Name)</label>
+                <input type="text" id="gh-repo" placeholder="مثال: HasaanyPROMAX">
+            </div>
+            <div class="input-group">
+                <label for="gh-path">مسار ملف الـ JSON (File Path)</label>
+                <input type="text" id="gh-path" placeholder="مثال: apps.json" value="apps.json">
+            </div>
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label for="gh-token">رمز الوصول الشخصي (GitHub Personal Access Token - PAT)</label>
+            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-primary" onclick="fetchData()">جلب البيانات وحفظ الإعدادات</button>
+            <button class="btn-secondary" onclick="clearSavedSettings()" style="background-color: var(--danger-color);">مسح الإعدادات المحفوظة</button>
+        </div>
+    </div>
+
+    <div id="status" class="status-message"></div>
+
+    <div class="section">
+        <h3>إضافة تطبيق جديد</h3>
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label>اسم التطبيق</label>
+                <input type="text" id="app-name" placeholder="Hassany Store">
+            </div>
+            <div class="input-group">
+                <label>Bundle Identifier</label>
+                <input type="text" id="app-bundle" placeholder="com.hassanyIPA">
+            </div>
+        </div>
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label>رابط الصورة (Image URL)</label>
+                <input type="text" id="app-image" placeholder="https://...">
+            </div>
+            <div class="input-group">
+                <label>رابط التحميل (IPA Download URL)</label>
+                <input type="text" id="app-url" placeholder="https://github.com/...">
+            </div>
+        </div>
+        <button class="btn-primary" onclick="addApp()">إضافة التطبيق للقائمة</button>
+    </div>
+
+    <div class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3>قائمة التطبيقات الحالية</h3>
+            <button class="btn-primary" style="background-color: var(--success-color); color: white;" onclick="saveData()">حفظ التغييرات ونشرها إلى GitHub</button>
+        </div>
+        <div id="apps-container">
+            <p style="color: var(--text-muted); text-align: center;">قم بتعبئة بيانات جيت هب واضغط على "جلب البيانات" لعرض التطبيقات.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let localData = { "apps": [] };
+    let fileSHA = ""; 
+
+    // دالة لحفظ الإعدادات في متصفحك محلياً لقفل التوكن والراحة
+    function saveSettingsToLocalStorage() {
+        const user = document.getElementById('gh-user').value.trim();
+        const repo = document.getElementById('gh-repo').value.trim();
+        const path = document.getElementById('gh-path').value.trim();
+        const token = document.getElementById('gh-token').value.trim();
+
+        localStorage.setItem('dashboard_gh_user', user);
+        localStorage.setItem('dashboard_gh_repo', repo);
+        localStorage.setItem('dashboard_gh_path', path);
+        localStorage.setItem('dashboard_gh_token', token);
+    }
+
+    // دالة لاسترجاع الإعدادات تلقائياً عند فتح الصفحة
+    function loadSettingsFromLocalStorage() {
+        if (localStorage.getItem('dashboard_gh_user')) {
+            document.getElementById('gh-user').value = localStorage.getItem('dashboard_gh_user');
+            document.getElementById('gh-repo').value = localStorage.getItem('dashboard_gh_repo');
+            document.getElementById('gh-path').value = localStorage.getItem('dashboard_gh_path');
+            document.getElementById('gh-token').value = localStorage.getItem('dashboard_gh_token');
+            showStatus("تم استعادة بيانات الربط والتوكن تلقائياً من ذاكرة المتصفح الآمنة.", "success");
+            // جلب البيانات فورياً إذا رغبت
+            fetchData();
+        }
+    }
+
+    // دالة لمسح التخزين في المتصفح إذا أردت تنظيف اللوحة
+    function clearSavedSettings() {
+        if(confirm("هل أنت متأكد من رغبتك في حذف البيانات المحفوظة بالمتصفح؟")) {
+            localStorage.removeItem('dashboard_gh_user');
+            localStorage.removeItem('dashboard_gh_repo');
+            localStorage.removeItem('dashboard_gh_path');
+            localStorage.removeItem('dashboard_gh_token');
+            
+            document.getElementById('gh-user').value = '';
+            document.getElementById('gh-repo').value = '';
+            document.getElementById('gh-path').value = 'apps.json';
+            document.getElementById('gh-token').value = '';
+            
+            showStatus("تم مسح البيانات المحفوظة محلياً بنجاح.", "info");
+        }
+    }
+
+    // دوال التعامل مع الكود الآمن للغة العربية (Base64 عالي التوافق)
+    function utf8_to_b64(str) {
+        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+    }
+
+    function b64_to_utf8(str) {
+        return decodeURIComponent(atob(str).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    }
+
+    function showStatus(text, type) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerText = text;
+        statusDiv.className = `status-message status-${type}`;
+        statusDiv.style.display = 'block';
+    }
+
+    // جلب البيانات من GitHub
+    async function fetchData() {
+        const user = document.getElementById('gh-user').value.trim();
+        const repo = document.getElementById('gh-repo').value.trim();
+        const path = document.getElementById('gh-path').value.trim();
+        const token = document.getElementById('gh-token').value.trim();
+
+        if (!user || !repo || !path || !token) {
+            showStatus("يرجى ملء جميع حقول ربط جيت هب والتوكن أولاً.", "error");
+            return;
+        }
+
+        // حفظ المدخلات فوراً في الـ LocalStorage
+        saveSettingsToLocalStorage();
+
+        showStatus("جاري جلب البيانات من GitHub...", "info");
+
+        const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+        
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+
+            if (!response.ok) {
+                if(response.status === 404) {
+                    throw new Error("الملف غير موجود في المسار المحدد، سيتم إنشاء ملف جديد عند الحفظ أول مرة.");
+                } else if(response.status === 401) {
+                    throw new Error("رمز الوصول (Token) غير صحيح أو منتهي الصلاحية.");
+                } else {
+                    throw new Error(`خطأ في الاتصال: ${response.statusText}`);
+                }
+            }
+
+            const resData = await response.json();
+            fileSHA = resData.sha; 
+            
+            const decodedContent = b64_to_utf8(resData.content);
+            localData = JSON.parse(decodedContent);
+            
+            if (!localData.apps) localData.apps = [];
+
+            showStatus("تمت مزامنة البيانات وحفظ الإعدادات بالمتصفح بنجاح.", "success");
+            renderApps();
+
+        } catch (error) {
+            if (error.message.includes("غير موجود")) {
+                localData = { "apps": [] };
+                fileSHA = "";
+                renderApps();
+                showStatus(error.message, "info");
+            } else {
+                showStatus(`فشل الجلب: ${error.message}`, "error");
+            }
+        }
+    }
+
+    function renderApps() {
+        const container = document.getElementById('apps-container');
+        container.innerHTML = '';
+
+        if (localData.apps.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">لا توجد تطبيقات حالياً في الملف.</p>';
+            return;
+        }
+
+        localData.apps.forEach((app, index) => {
+            const isHidden = app.hidden === true;
+            const card = document.createElement('div');
+            card.className = `app-card ${isHidden ? 'hidden-app' : ''}`;
+            
+            card.innerHTML = `
+                <div class="app-info">
+                    <img src="${app.image || 'https://via.placeholder.com/55'}" alt="App Icon">
+                    <div class="app-details">
+                        <div class="app-name">${app.name}</div>
+                        <div class="app-bundle">${app.bundleIdentifier}</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn-secondary" onclick="toggleHideApp(${index})">${isHidden ? 'إظهار' : 'إخفاء'}</button>
+                    <button class="btn-danger" onclick="deleteApp(${index})">حذف</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function addApp() {
+        const name = document.getElementById('app-name').value.trim();
+        const bundle = document.getElementById('app-bundle').value.trim();
+        const image = document.getElementById('app-image').value.trim();
+        const url = document.getElementById('app-url').value.trim();
+
+        if (!name || !bundle || !url) {
+            showStatus("الاسم، الـ Bundle ID، ورابط التحميل حقول إجبارية لإضافة التطبيق.", "error");
+            return;
+        }
+
+        const newApp = {
+            name: name,
+            bundleIdentifier: bundle,
+            image: image || "https://via.placeholder.com/150",
+            downloadURL: url,
+            hidden: false
+        };
+
+        localData.apps.push(newApp);
+        renderApps();
+        showStatus(`تمت إضافة ${name} للقائمة المؤقتة (تذكر الضغط على حفظ التغييرات بالأسفل لتثبيته في جيت هب).`, "success");
+
+        document.getElementById('app-name').value = '';
+        document.getElementById('app-bundle').value = '';
+        document.getElementById('app-image').value = '';
+        document.getElementById('app-url').value = '';
+    }
+
+    function deleteApp(index) {
+        const appName = localData.apps[index].name;
+        localData.apps.splice(index, 1);
+        renderApps();
+        showStatus(`تم حذف ${appName} من القائمة المؤقتة. اضغط على حفظ للتأكيد.`, "info");
+    }
+
+    function toggleHideApp(index) {
+        localData.apps[index].hidden = !localData.apps[index].hidden;
+        renderApps();
+    }
+
+    // حفظ وإرسال البيانات المعدلة إلى GitHub
+    async function saveData() {
+        const user = document.getElementById('gh-user').value.trim();
+        const repo = document.getElementById('gh-repo').value.trim();
+        const path = document.getElementById('gh-path').value.trim();
+        const token = document.getElementById('gh-token').value.trim();
+
+        if (!user || !repo || !path || !token) {
+            showStatus("بيانات التوصيل والتوكن ناقصة، لا يمكن الحفظ.", "error");
+            return;
+        }
+
+        saveSettingsToLocalStorage(); // تأكيد الحفظ المحلي للاحتياط
+
+        showStatus("جاري رفع التحديثات إلى مستودع GitHub...", "info");
+
+        const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+        const jsonString = JSON.stringify(localData, null, 2);
+        const base64Content = utf8_to_b64(jsonString);
+
+        const bodyData = {
+            message: "تحديث قائمة التطبيقات الإدارية",
+            content: base64Content
+        };
+
+        if (fileSHA) {
+            bodyData.sha = fileSHA;
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Accept": "application/vnd.github.v3+json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(bodyData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`خطأ أثناء الحفظ: ${response.statusText}`);
+            }
+
+            const resData = await response.json();
+            fileSHA = resData.content.sha; 
+
+            showStatus("تم حفظ الملف بنجاح وتحديثه على مستودع GitHub بنجاح تام!", "success");
+
+        } catch (error) {
+            showStatus(`فشل الحفظ في GitHub: ${error.message}`, "error");
+        }
+    }
+
+    // تشغيل جلب الإعدادات المحفوظة بمجرد فتح الصفحة تلقائياً
+    window.onload = loadSettingsFromLocalStorage;
+</script>
+
+</body>
+</html>
